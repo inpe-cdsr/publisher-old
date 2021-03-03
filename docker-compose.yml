@@ -1,0 +1,140 @@
+version: '3.1'
+
+networks:
+  catalog_inpe_cdsr:
+    external: true
+
+services:
+
+  inpe_cdsr_publisher_old_dashboard:
+    build:
+      context: ../publisher-old-dashboard/docker
+      dockerfile: ./Dockerfile
+    container_name: inpe_cdsr_publisher_old_dashboard
+    image: publisher-dashboard
+    restart: always
+    volumes:
+      - ../publisher-old-dashboard:/app
+      - ./publisher:/publisher
+      - ${INPE_CDSR_DATA}/TIFF:/TIFF
+    env_file:
+      - ./env_files/dashboard.env
+    command: python index.py
+    networks:
+      - catalog_inpe_cdsr
+    ports:
+      - 5004:8050
+
+  inpe_cdsr_publisher_rabbitmq:
+    container_name: inpe_cdsr_publisher_rabbitmq
+    image: rabbitmq:3-management
+    restart: always
+    environment:
+      - "TZ:America/Sao_Paulo"
+    networks:
+      - catalog_inpe_cdsr
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  inpe_cdsr_publisher_api:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    container_name: inpe_cdsr_publisher_api
+    image: registry.dpi.inpe.br/brazildatacube/publisher:0.0.1-celery
+    restart: always
+    user: ${UID}:${GID}
+    volumes:
+      - ./:/app
+      - ${INPE_CDSR_DATA}/TIFF:/TIFF
+      - ${INPE_CDSR_DATA}/Level-2:/Level-2
+    env_file:
+      - ./env_files/publisher.env
+    environment:
+      - "FLASK_APP=publisher"
+    networks:
+      - catalog_inpe_cdsr
+    command: bash -c "flask run --host 0.0.0.0"
+    depends_on:
+      - inpe_cdsr_publisher_rabbitmq
+    ports:
+      - 5000:5000
+
+  # celery - processing
+  inpe_cdsr_publisher_worker_processing:
+    container_name: inpe_cdsr_publisher_worker_processing
+    image: registry.dpi.inpe.br/brazildatacube/publisher:0.0.1-celery
+    restart: always
+    user: ${UID}:${GID}
+    volumes:
+      - ./:/app
+      - ${INPE_CDSR_DATA}/TIFF:/TIFF
+      - ${INPE_CDSR_DATA}/Level-2:/Level-2
+      - ${INPE_CDSR_DATA}/TIFF:/public
+    env_file:
+      - ./env_files/publisher.env
+    command: >
+      celery -A publisher.celery.worker:celery worker --heartbeat-interval 480 -l INFO --concurrency 10 -Q processing
+    networks:
+      - catalog_inpe_cdsr
+    depends_on:
+      - inpe_cdsr_publisher_rabbitmq
+      - inpe_cdsr_publisher_api
+
+  # celery - publish
+  inpe_cdsr_publisher_worker_publish:
+    container_name: inpe_cdsr_publisher_worker_publish
+    image: registry.dpi.inpe.br/brazildatacube/publisher:0.0.1-celery
+    restart: always
+    user: ${UID}:${GID}
+    volumes:
+      - ./:/app
+      - ${INPE_CDSR_DATA}/TIFF:/TIFF
+    env_file:
+      - ./env_files/publisher.env
+    command: >
+      celery -A publisher.celery.worker:celery worker --heartbeat-interval 480 -l INFO --concurrency 2 -Q publish
+    networks:
+      - catalog_inpe_cdsr
+    depends_on:
+      - inpe_cdsr_publisher_rabbitmq
+      - inpe_cdsr_publisher_api
+    
+  # celery - quicklook
+  inpe_cdsr_publisher_worker_quicklook:
+    container_name: inpe_cdsr_publisher_worker_quicklook
+    image: registry.dpi.inpe.br/brazildatacube/publisher:0.0.1-celery
+    restart: always
+    user: ${UID}:${GID}
+    volumes:
+      - ./:/app
+      - ${INPE_CDSR_DATA}/TIFF:/TIFF
+    env_file:
+      - ./env_files/publisher.env
+    command: >
+      celery -A publisher.celery.worker:celery worker --heartbeat-interval 480 -l INFO --concurrency 6 -Q quicklook
+    networks:
+      - catalog_inpe_cdsr
+    depends_on:
+      - inpe_cdsr_publisher_rabbitmq
+      - inpe_cdsr_publisher_api
+    
+  # celery - upload
+  inpe_cdsr_publisher_worker_upload:
+    container_name: inpe_cdsr_publisher_worker_upload
+    image: registry.dpi.inpe.br/brazildatacube/publisher:0.0.1-celery
+    restart: always
+    user: ${UID}:${GID}
+    volumes:
+      - ./:/app
+      - ${INPE_CDSR_DATA}/TIFF:/TIFF
+    env_file:
+      - ./env_files/publisher.env
+    command: >
+      celery -A publisher.celery.worker:celery worker --heartbeat-interval 480 -l INFO --concurrency 4 -Q upload
+    networks:
+      - catalog_inpe_cdsr
+    depends_on:
+      - inpe_cdsr_publisher_rabbitmq
+      - inpe_cdsr_publisher_api

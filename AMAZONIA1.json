@@ -1,0 +1,47 @@
+{
+"cloudcover": {
+    "WFI": {
+      "nir" : 220, 
+      "red" : 450, 
+      "green" : 540,
+      "blue" : 620
+    }
+  }, 
+"quicklook": {
+    "WFI": [
+      "red", 
+      "nir", 
+      "green"
+    ]
+ },
+"resolution": {
+    "WFI": 58
+  }, 
+"publish":
+	{
+		"SR": 
+		{
+			"WFI": 
+			{
+				"blue":    "BAND1_GRID_SURFACE.tif", 
+				"green":   "BAND2_GRID_SURFACE.tif", 
+				"red":     "BAND3_GRID_SURFACE.tif",
+				"nir":     "BAND4_GRID_SURFACE.tif", 
+				"quality": "CMASK_GRID_SURFACE.tif", 
+				"evi":     "EVI.tif", 
+				"ndvi":    "NDVI.tif"
+			} 
+		},
+		"DN": 
+		{
+			"WFI": 
+			{
+				"blue":  "BAND1.tif", 
+				"green": "BAND2.tif", 
+				"red":   "BAND3.tif",
+				"nir":   "BAND4.tif"
+			}
+		}
+
+	}
+}

@@ -1,0 +1,30 @@
+{
+"quicklook": {
+    "ETM": [
+      "red", 
+      "nir", 
+      "green"
+    ]
+  }, 
+"resolution": {
+    "ETM": 30
+  }, 
+"publish":
+	{
+		"DN": 
+		{
+			"ETM": 
+			{
+				"blue":  "BAND1.tif", 
+				"green": "BAND2.tif", 
+				"red":   "BAND3.tif",
+				"nir":   "BAND4.tif",
+				"swir1": "BAND5.tif",
+				"thermal": "BAND6.tif",
+				"swir2": "BAND7.tif",
+				"pan": "BAND8.tif"
+			}
+		}
+
+	}
+}

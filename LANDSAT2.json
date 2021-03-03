@@ -1,0 +1,26 @@
+{
+"quicklook": {
+    "MSS": [
+      "red", 
+      "nir", 
+      "green"
+    ]
+  }, 
+"resolution": {
+    "MSS": 58
+  }, 
+"publish":
+	{
+		"DN": 
+		{
+			"MSS": 
+			{
+				"blue":  "BAND4.tif", 
+				"green": "BAND5.tif", 
+				"red":   "BAND6.tif",
+				"nir":   "BAND7.tif"
+			}
+		}
+
+	}
+}

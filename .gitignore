@@ -1,0 +1,17 @@
+# env folder
+env_files/*
+!env_files/*.EXAMPLE
+
+.env
+!env.EXAMPLE
+
+# repositories
+publisher-api
+publisher-dashboard
+publisher
+
+# log files
+publisher.log
+
+# python folders
+__pycache__
