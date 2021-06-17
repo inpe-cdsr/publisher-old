@@ -6,15 +6,15 @@ networks:
 
 services:
 
-  inpe_cdsr_publisher_old_dashboard:
+  inpe_cdsr_publisher_dashboard:
     build:
-      context: ../publisher-old-dashboard/docker
+      context: ../publisher-dashboard/docker
       dockerfile: ./Dockerfile
-    container_name: inpe_cdsr_publisher_old_dashboard
+    container_name: inpe_cdsr_publisher_dashboard
     image: publisher-dashboard
     restart: always
     volumes:
-      - ../publisher-old-dashboard:/app
+      - ../publisher-dashboard:/app
       - ./publisher:/publisher
       - ${INPE_CDSR_DATA}/TIFF:/TIFF
     env_file:
@@ -71,7 +71,7 @@ services:
       - ./:/app
       - ${INPE_CDSR_DATA}/TIFF:/TIFF
       - ${INPE_CDSR_DATA}/Level-2:/Level-2
-      - ${INPE_CDSR_DATA}/TIFF:/public
+      - ${INPE_CDSR_DATA}/TIFF/comissionamento:/public
     env_file:
       - ./env_files/publisher.env
     command: >
